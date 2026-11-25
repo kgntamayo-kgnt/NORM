@@ -22,6 +22,7 @@ import {
   RADIONUCLIDES_DB,
   ROCK_CONCENTRATIONS,
 } from '../data/normData';
+import { NormAppearanceVisuals } from './VisualSchematics';
 
 interface ProcessMapProps {
   anexo2Rows: Anexo2Row[];
@@ -505,6 +506,9 @@ export const ProcessMap: React.FC<ProcessMapProps> = ({ anexo2Rows, avgBackgroun
           </div>
         </div>
       </section>
+
+      {/* FORMAS DE APARICIÓN ANIMADAS (AGUA, INCRUSTACIONES, LODOS, PELÍCULAS) */}
+      <NormAppearanceVisuals />
 
       {/* BENCHMARK ACTIVIDAD IOGP 412 + MATRICES AMBIENTALES */}
       <section className="grid grid-cols-1 lg:grid-cols-12 gap-6">

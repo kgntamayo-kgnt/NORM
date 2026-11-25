@@ -37,6 +37,7 @@ import {
   ScenarioPreset,
 } from '../data/normData';
 import bannerImg from '../assets/images/oil_gas_facility_banner_1795569270407.jpg';
+import { WorkflowGuideStrip } from './VisualSchematics';
 
 interface ExecutiveDashboardProps {
   avgBackground: number;
@@ -557,6 +558,9 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
           </a>
         </div>
       </section>
+
+      {/* RUTA VISUAL INTERACTIVA DE USO */}
+      <WorkflowGuideStrip onNavigate={onNavigate} />
 
       {/* FRANJA DE 4 INDICADORES PRINCIPALES */}
       <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">

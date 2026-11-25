@@ -21,6 +21,7 @@ import {
   Users,
 } from 'lucide-react';
 import { RADIATION_SHIELDING, TRAINING_PROFILES } from '../data/normData';
+import { AlaraLiveScene, HumanHygieneSchematic } from './VisualSchematics';
 
 interface ProtectionAndAlaraProps {
   baseSourceRate?: number;
@@ -254,6 +255,13 @@ export const ProtectionAndAlara: React.FC<ProtectionAndAlaraProps> = ({
                 </span>
               </div>
             </div>
+
+            <AlaraLiveScene
+              distanceM={distanceM}
+              stayHours={stayHours}
+              shieldId={shieldId}
+              effectiveDoseRate={effectiveDoseRate}
+            />
 
             <div className="border border-slate-200 rounded-xl p-4">
               <div className="flex items-center justify-between text-xs mb-2">
@@ -633,6 +641,7 @@ export const ProtectionAndAlara: React.FC<ProtectionAndAlaraProps> = ({
               <Droplets className="w-4 h-4 text-sky-700" />
               Higiene y Descontaminación Humana
             </h3>
+            <HumanHygieneSchematic />
             <ul className="space-y-2 text-xs text-slate-600 leading-relaxed">
               <li>
                 <strong className="text-slate-800">Restricción en zona:</strong> Prohibido comer, beber o fumar en áreas con posible presencia de NORM para evitar incorporación interna.

@@ -10,6 +10,7 @@ import {
   ShieldAlert,
   Wrench,
 } from 'lucide-react';
+import { DecontaminationMethodsSchematic } from './VisualSchematics';
 
 interface DecisionTreesProps {
   onShowToast: (msg: string) => void;
@@ -289,6 +290,7 @@ export const DecisionTrees: React.FC<DecisionTreesProps> = ({ onShowToast }) => 
                         Embalar para evitar dispersión antes del traslado y seleccionar la técnica adecuada según geometría y control de residuos secundarios.
                       </p>
                     </div>
+                    <DecontaminationMethodsSchematic />
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                       <div className="bg-white p-4 rounded-lg border border-slate-200 space-y-2">
                         <span className="font-bold text-sky-800 block">Métodos Abrasivos (Incrustaciones y Lodos)</span>

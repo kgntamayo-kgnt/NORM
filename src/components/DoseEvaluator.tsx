@@ -11,6 +11,7 @@ import {
 } from 'recharts';
 import { Activity, AlertTriangle, CheckCircle2, PlusCircle, RotateCcw } from 'lucide-react';
 import { classifyDoseRate } from '../data/normData';
+import { FieldMeasurementSchematic } from './VisualSchematics';
 
 interface DoseEvaluatorProps {
   backgroundReadings: number[];
@@ -160,6 +161,15 @@ export const DoseEvaluator: React.FC<DoseEvaluatorProps> = ({
           </div>
         ))}
       </div>
+
+      {/* ESQUEMA ANIMADO DE MEDICIÓN EN CAMPO (FONDO vs 30 CM) */}
+      <FieldMeasurementSchematic
+        avgBackground={avgBackground}
+        pointReading={pointReading}
+        netDoseRate={netDoseRate}
+        tierColor={classification.colorHex}
+        tierLabel={classification.shortLabel}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* COLUMNA IZQUIERDA: CONTROLES DE ENTRADA */}
