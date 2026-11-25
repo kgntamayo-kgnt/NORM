@@ -3,8 +3,7 @@ export type RiskTier = 'normal' | 'investigacion' | 'intervencion' | 'actuacion'
 export const IAEA_GLOSSARY_URL =
   'https://www.iaea.org/es/publications/15649/glosario-de-seguridad-nuclear-tecnologica-y-fisica-del-oiea';
 
-export const REFERENCE_PDF_PATH =
-  '/assets/aistudio/30._Criterios_de_vigilancia_radiol_gica_MME_2021_3acd7ec2.pdf';
+export const REFERENCE_PDF_PATH = `${import.meta.env.BASE_URL}assets/aistudio/30._Criterios_de_vigilancia_radiol_gica_MME_2021_3acd7ec2.pdf`;
 
 export interface RadionuclideInfo {
   symbol: string;
