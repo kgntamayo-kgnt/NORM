@@ -55,8 +55,8 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   {
     id: 'executive',
-    label: 'Panel Ejecutivo',
-    sectionHint: 'Visión Gerencial y Decisiones',
+    label: 'Panorama General',
+    sectionHint: 'Vigilancia Radiológica y Prioridades',
     icon: LayoutDashboard,
   },
   {
@@ -188,7 +188,7 @@ export default function App() {
         obs,
       },
     ]);
-    showToast(`${nextCode} agregado al Anexo 2 y sincronizado con el Panel Ejecutivo.`);
+    showToast(`${nextCode} agregado al Anexo 2 y sincronizado con el Panorama General.`);
   };
 
   const handleInspectPoint = (measured: number) => {
@@ -390,12 +390,14 @@ export default function App() {
               <ExecutiveDashboard
                 avgBackground={avgBackground}
                 radonLevel={radonLevel}
+                fieldMeta={fieldMeta}
                 anexo2Rows={anexo2Rows}
                 anexo3Rows={anexo3Rows}
                 activeScenarioId={activeScenarioId}
                 onApplyScenario={handleApplyScenario}
                 onNavigate={(tab) => handleSelectTab(tab as NavTabId)}
                 onInspectPoint={handleInspectPoint}
+                onShowToast={showToast}
               />
             )}
 

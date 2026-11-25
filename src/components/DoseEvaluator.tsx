@@ -303,7 +303,7 @@ export const DoseEvaluator: React.FC<DoseEvaluatorProps> = ({
           {/* Acción: Guardar directamente al Anexo 2 */}
           <div className="pt-4 border-t border-slate-200 space-y-2.5">
             <label className="block text-xs font-semibold text-slate-800">
-              Enviar esta evaluación al Anexo 2 y Tablero Ejecutivo
+              Enviar esta evaluación al Anexo 2 y Panorama General
             </label>
             <div className="flex flex-col sm:flex-row gap-2">
               <input
@@ -453,7 +453,7 @@ export const DoseEvaluator: React.FC<DoseEvaluatorProps> = ({
               </div>
 
               <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200">
-                <span className="text-[11px] text-slate-500 block">Prioridad Gerencial</span>
+                <span className="text-[11px] text-slate-500 block">Prioridad Operativa</span>
                 <span
                   className="text-sm font-bold mt-1.5 block"
                   style={{ color: classification.colorHex }}

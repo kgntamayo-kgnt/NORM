@@ -230,7 +230,7 @@ export const FieldRecords: React.FC<FieldRecordsProps> = ({
               Registros Digitales de Vigilancia Radiológica en Campo
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
-              Cualquier edición aquí actualiza automáticamente los gráficos y la matriz de decisiones del Panel Ejecutivo.
+              Cualquier edición aquí actualiza automáticamente los gráficos y el plan de acción del Panorama General.
             </p>
           </div>
 

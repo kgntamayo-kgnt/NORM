@@ -766,7 +766,7 @@ export function classifyDoseRate(measured: number, avgBackground: number): DoseC
       shortLabel: 'Actuación',
       level: 'Nivel de Actuación (> 10 µSv/h netos)',
       urgency: 'Inmediata (< 24 h)',
-      owner: 'Gerencia Operaciones + RVR',
+      owner: 'Coordinación Operativa + RVR',
       colorHex: '#DC2626',
       bgSurface: 'bg-red-50',
       borderClass: 'border-red-200',

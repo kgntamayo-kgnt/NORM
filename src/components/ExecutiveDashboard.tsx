@@ -15,9 +15,13 @@ import {
 import {
   AlertTriangle,
   ArrowRight,
+  BookOpen,
   CheckCircle2,
   ClipboardCheck,
-  Printer,
+  Download,
+  ExternalLink,
+  FileSpreadsheet,
+  FileText,
   ShieldAlert,
   TrendingUp,
 } from 'lucide-react';
@@ -26,6 +30,9 @@ import {
   Anexo3Row,
   classifyDoseRate,
   EXECUTIVE_SCENARIOS,
+  FieldHeaderMeta,
+  IAEA_GLOSSARY_URL,
+  REFERENCE_PDF_PATH,
   RiskTier,
   ScenarioPreset,
 } from '../data/normData';
@@ -34,12 +41,14 @@ import bannerImg from '../assets/images/oil_gas_facility_banner_1795569270407.jp
 interface ExecutiveDashboardProps {
   avgBackground: number;
   radonLevel: number;
+  fieldMeta: FieldHeaderMeta;
   anexo2Rows: Anexo2Row[];
   anexo3Rows: Anexo3Row[];
   activeScenarioId: string;
   onApplyScenario: (scenario: ScenarioPreset) => void;
   onNavigate: (tab: string) => void;
   onInspectPoint: (measured: number) => void;
+  onShowToast: (msg: string) => void;
 }
 
 const TIER_META: Record<RiskTier, { label: string; color: string; order: number }> = {
@@ -49,15 +58,24 @@ const TIER_META: Record<RiskTier, { label: string; color: string; order: number 
   normal: { label: 'Normal (Fondo)', color: '#059669', order: 3 },
 };
 
+const escapeHtml = (value: string | number): string =>
+  String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+
 export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
   avgBackground,
   radonLevel,
+  fieldMeta,
   anexo2Rows,
   anexo3Rows,
   activeScenarioId,
   onApplyScenario,
   onNavigate,
   onInspectPoint,
+  onShowToast,
 }) => {
   const [imgError, setImgError] = useState(false);
 
@@ -183,9 +201,224 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
 
   const investigationThresholdNet = Number((avgBackground * 2).toFixed(2));
 
+  const handleExportHtmlReport = () => {
+    try {
+      const reportDate = fieldMeta.date || new Date().toISOString().slice(0, 10);
+      const filename = `Informe_Vigilancia_Radiologica_NORM_${reportDate}.html`;
+
+      const pointsRowsHtml = enrichedPoints
+        .map(
+          (pt) => `
+          <tr>
+            <td style="font-family:monospace;font-weight:600;">${escapeHtml(pt.code)}</td>
+            <td>${escapeHtml(pt.desc)}</td>
+            <td style="text-align:right;font-family:monospace;">${Number(pt.measured).toFixed(2)}</td>
+            <td style="text-align:right;font-family:monospace;font-weight:700;">${pt.net.toFixed(3)}</td>
+            <td style="font-weight:700;color:${pt.classification.colorHex};">${escapeHtml(pt.classification.shortLabel)}</td>
+            <td>${escapeHtml(pt.classification.owner)}</td>
+            <td>${escapeHtml(pt.classification.executiveDirective)}</td>
+          </tr>`
+        )
+        .join('');
+
+      const dosimetryRowsHtml = anexo3Rows
+        .map(
+          (r) => `
+          <tr>
+            <td style="font-family:monospace;">${escapeHtml(r.date)}</td>
+            <td>${escapeHtml(r.worker)}</td>
+            <td>${escapeHtml(r.role)}</td>
+            <td>${escapeHtml(r.activity)}</td>
+            <td style="text-align:right;font-family:monospace;">${Number(r.hours).toFixed(1)}</td>
+            <td style="text-align:right;font-family:monospace;font-weight:700;">${Number(r.dose).toFixed(1)}</td>
+          </tr>`
+        )
+        .join('');
+
+      const htmlDoc = `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>Informe Técnico de Vigilancia Radiológica NORM — ${escapeHtml(reportDate)}</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #0F172A; margin: 32px; line-height: 1.5; }
+  h1 { font-size: 20px; margin: 0 0 6px; color: #0B1320; }
+  h2 { font-size: 14px; margin: 24px 0 10px; padding-bottom: 6px; border-bottom: 2px solid #E2E8F0; color: #0B1320; text-transform: uppercase; letter-spacing: 0.04em; }
+  .subtitle { font-size: 12px; color: #475569; margin-bottom: 18px; }
+  .banner { background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 10px; padding: 14px 16px; margin-bottom: 18px; }
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
+  .kpi { border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px; background: #FFFFFF; }
+  .kpi-label { font-size: 11px; color: #64748B; }
+  .kpi-val { font-size: 20px; font-weight: 700; font-family: monospace; margin-top: 4px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
+  th, td { border: 1px solid #CBD5E1; padding: 8px 10px; text-align: left; vertical-align: top; }
+  th { background: #F1F5F9; font-weight: 600; color: #334155; }
+  .meta-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 18px; font-size: 12px; }
+  .footer { margin-top: 28px; padding-top: 12px; border-top: 1px solid #CBD5E1; font-size: 11px; color: #475569; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  @media print { body { margin: 16px; } .no-print { display: none; } }
+</style>
+</head>
+<body>
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:16px;">
+    <div>
+      <h1>Informe Técnico de Vigilancia Radiológica NORM</h1>
+      <div class="subtitle">
+        Documento de referencia: Criterios de vigilancia radiológica durante el desarrollo de los Proyectos Piloto de Investigación Integral, PPII, en yacimientos no convencionales de hidrocarburos (Ministerio de Minas y Energía, 2021) · OIEA GSR Part 3 / SSG-60 · IOGP 412.
+      </div>
+    </div>
+    <button class="no-print" onclick="window.print()" style="padding:8px 14px;background:#0B1320;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">
+      Imprimir / Guardar PDF
+    </button>
+  </div>
+
+  <div class="banner">
+    <div style="font-size:13px;font-weight:700;margin-bottom:4px;">Estado Global: ${escapeHtml(globalVerdict.status)}</div>
+    <div style="font-size:12px;color:#334155;">${escapeHtml(globalVerdict.message)}</div>
+  </div>
+
+  <h2>Datos de Inspección y Calibración</h2>
+  <div class="meta-grid">
+    <div><strong>Fecha y Hora:</strong> ${escapeHtml(fieldMeta.date)} ${escapeHtml(fieldMeta.time)}</div>
+    <div><strong>Responsable:</strong> ${escapeHtml(fieldMeta.performedBy)}</div>
+    <div><strong>Instrumento:</strong> ${escapeHtml(fieldMeta.detectorType)} (Serial: ${escapeHtml(fieldMeta.detectorSerial)})</div>
+    <div><strong>Vigencia Calibración:</strong> ${escapeHtml(fieldMeta.calibrationExpiry)}</div>
+    <div style="grid-column:1 / -1;"><strong>Actividad Evaluada:</strong> ${escapeHtml(fieldMeta.activityDesc)}</div>
+  </div>
+
+  <h2>Indicadores Clave de Vigilancia</h2>
+  <div class="kpis">
+    <div class="kpi">
+      <div class="kpi-label">Fondo Natural Base</div>
+      <div class="kpi-val">${avgBackground.toFixed(3)} µSv/h</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Tasa Neta Máxima (${escapeHtml(summary.maxPointCode)})</div>
+      <div class="kpi-val">${summary.maxNet.toFixed(2)} µSv/h</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Dosis Proyectada Máx.</div>
+      <div class="kpi-val">${summary.maxWorkerAnnualMsv.toFixed(2)} mSv/a</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">²²²Radón en Aire</div>
+      <div class="kpi-val">${radonLevel.toLocaleString('es-CO')} Bq/m³</div>
+    </div>
+  </div>
+
+  <h2>Resultados por Punto de Interés y Acciones Recomendadas (Anexo 2)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Punto</th>
+        <th>Descripción del Equipo / Área</th>
+        <th style="text-align:right;">Medida (µSv/h)</th>
+        <th style="text-align:right;">Neta (µSv/h)</th>
+        <th>Nivel</th>
+        <th>Responsable</th>
+        <th>Acción Recomendada</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${pointsRowsHtml}
+    </tbody>
+  </table>
+
+  <h2>Registro Dosimétrico Operacional (Anexo 3)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Trabajador</th>
+        <th>Rol</th>
+        <th>Actividad</th>
+        <th style="text-align:right;">Tiempo (h)</th>
+        <th style="text-align:right;">Lectura (µSv)</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${dosimetryRowsHtml}
+    </tbody>
+  </table>
+
+  <div class="footer">
+    <span>Referencia oficial: Criterios de vigilancia radiológica — Ministerio de Minas y Energía (2021) · Glosario OIEA.</span>
+    <strong>Desarrollado por Karel Giovanny Nuñez</strong>
+  </div>
+</body>
+</html>`;
+
+      const blob = new Blob([htmlDoc], { type: 'text/html;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+      onShowToast(`Informe técnico "${filename}" descargado. Ábrelo en tu navegador para imprimir o guardar en PDF.`);
+    } catch {
+      onShowToast('No fue posible generar el informe descargable.');
+    }
+  };
+
+  const handleExportSummaryCSV = () => {
+    try {
+      const reportDate = fieldMeta.date || new Date().toISOString().slice(0, 10);
+      const filename = `Resumen_Vigilancia_NORM_${reportDate}.csv`;
+      const rows: (string | number)[][] = [
+        ['Informe de Vigilancia Radiológica NORM', 'Referencia: Criterios de vigilancia radiológica (MME, 2021)'],
+        ['Fecha', fieldMeta.date, 'Responsable', fieldMeta.performedBy],
+        ['Fondo Natural Base (µSv/h)', avgBackground.toFixed(3), 'Radón-222 (Bq/m³)', radonLevel],
+        ['Estado Global', globalVerdict.status],
+        [],
+        [
+          'Punto',
+          'Descripción',
+          'Tasa Medida (µSv/h)',
+          'Tasa Neta (µSv/h)',
+          'Clasificación',
+          'Urgencia',
+          'Responsable',
+          'Acción Recomendada',
+        ],
+        ...enrichedPoints.map((pt) => [
+          pt.code,
+          pt.desc,
+          Number(pt.measured).toFixed(2),
+          pt.net.toFixed(3),
+          pt.classification.shortLabel,
+          pt.classification.urgency,
+          pt.classification.owner,
+          pt.classification.executiveDirective,
+        ]),
+      ];
+
+      const csvContent =
+        '\uFEFF' +
+        rows
+          .map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(','))
+          .join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+      onShowToast(`Archivo "${filename}" descargado correctamente.`);
+    } catch {
+      onShowToast('Error al exportar el resumen en formato CSV.');
+    }
+  };
+
   return (
     <div className="space-y-6 animate-fade-slide">
-      {/* HERO EJECUTIVO CON VISUAL DE FACILIDAD OIL & GAS */}
+      {/* CABECERA PRINCIPAL CON VISUAL DE INSTALACIÓN OIL & GAS */}
       <section className="relative overflow-hidden rounded-2xl bg-[#0B1320] text-white border border-slate-800">
         {!imgError ? (
           <img
@@ -203,7 +436,7 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
         <div className="relative z-10 p-6 lg:p-8 flex flex-col lg:flex-row lg:items-end justify-between gap-6">
           <div className="max-w-2xl space-y-3">
             <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
-              <span>Tablero Gerencial de Riesgo Radiológico</span>
+              <span>Vigilancia Radiológica NORM · Sector Hidrocarburos</span>
               <span aria-hidden="true">·</span>
               <span>MME Res. 18 1434 / 18 0005</span>
               <span aria-hidden="true">·</span>
@@ -211,7 +444,7 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
             </div>
 
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
-              Estado Radiológico de la Facilidad y Prioridades de Decisión
+              Estado Radiológico de la Instalación y Prioridades Operativas
             </h2>
 
             <div className={`p-4 rounded-xl border ${globalVerdict.borderTone} backdrop-blur-xs transition-all duration-200`}>
@@ -222,7 +455,7 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
                   <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
                 )}
                 <span className={`text-sm font-semibold ${globalVerdict.tone}`}>
-                  Dictamen Global: {globalVerdict.status}
+                  Estado Global: {globalVerdict.status}
                 </span>
               </div>
               <p className="text-sm text-slate-200 leading-relaxed">{globalVerdict.message}</p>
@@ -240,20 +473,20 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
             </button>
             <button
               type="button"
-              onClick={() => window.print()}
+              onClick={handleExportHtmlReport}
               className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-white/10 hover:bg-white/15 text-white border border-white/15 text-sm font-medium transition-colors whitespace-nowrap"
             >
-              <Printer className="w-4 h-4" />
-              Imprimir Informe Ejecutivo
+              <Download className="w-4 h-4" />
+              Exportar Informe Técnico
             </button>
           </div>
         </div>
 
-        {/* BARRA DE SIMULACIÓN DE ESCENARIOS PARA TOMADORES DE DECISIÓN */}
+        {/* BARRA DE SIMULACIÓN DE ESCENARIOS OPERATIVOS */}
         <div className="relative z-10 px-6 lg:px-8 py-3.5 bg-slate-950/70 border-t border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-3 no-print">
           <div className="text-xs text-slate-300">
             <span className="font-semibold text-white">Simulador de Escenarios Operativos:</span>{' '}
-            Alterna condiciones de campo para evaluar impacto regulatorio y prioridades.
+            Alterna condiciones de campo para analizar niveles de referencia y medidas de control.
           </div>
           <div className="flex flex-wrap items-center gap-1.5">
             {EXECUTIVE_SCENARIOS.map((sc) => {
@@ -277,7 +510,55 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
         </div>
       </section>
 
-      {/* FRANJA DE 4 KPIs EJECUTIVOS */}
+      {/* REFERENCIA OFICIAL AL DOCUMENTO DE CRITERIOS DE VIGILANCIA RADIOLÓGICA */}
+      <section className="bg-white border border-slate-200 rounded-xl px-5 py-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div className="flex items-start gap-3 min-w-0">
+          <div className="w-9 h-9 rounded-lg bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-700 shrink-0 mt-0.5">
+            <FileText className="w-4 h-4" />
+          </div>
+          <div className="min-w-0">
+            <div className="text-xs font-semibold text-sky-800">
+              Documento Técnico de Referencia · Ministerio de Minas y Energía (2021)
+            </div>
+            <p className="text-xs text-slate-700 leading-relaxed mt-0.5">
+              Basado en{' '}
+              <strong className="font-semibold text-slate-900">
+                “Criterios de vigilancia radiológica durante el desarrollo de los Proyectos Piloto de
+                Investigación Integral, PPII, en yacimientos no convencionales de hidrocarburos a
+                través de la técnica de fracturamiento hidráulico multietapa con perforación
+                horizontal”
+              </strong>{' '}
+              (Grupo de Energías no Convencionales y Asuntos Nucleares, OARE – MinEnergía), diseñado
+              como herramienta abierta de consulta y apoyo para equipos técnicos, operadores, HSE,
+              responsables de vigilancia radiológica y grupos de interés.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 shrink-0 no-print">
+          <a
+            href={REFERENCE_PDF_PATH}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition-colors whitespace-nowrap"
+          >
+            <FileText className="w-3.5 h-3.5 text-amber-400" />
+            Ver Documento (PDF)
+          </a>
+          <a
+            href={IAEA_GLOSSARY_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 text-xs font-semibold transition-colors whitespace-nowrap"
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            Glosario OIEA
+            <ExternalLink className="w-3 h-3" />
+          </a>
+        </div>
+      </section>
+
+      {/* FRANJA DE 4 INDICADORES PRINCIPALES */}
       <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <div className="bg-white border border-slate-200 rounded-xl p-5 flex flex-col justify-between transition-transform duration-150 hover:-translate-y-0.5">
           <div className="flex items-center justify-between gap-2 text-xs text-slate-500">
@@ -385,7 +666,7 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-5">
             <div>
               <h3 className="text-base font-bold text-slate-900">
-                Perfil Radiométrico por Punto de Interés vs. Umbrales MME / OIEA
+                Perfil Radiométrico por Punto de Interés vs. Niveles de Referencia
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
                 Tasa de dosis neta (µSv/h) sincronizada con Anexo 2. Haz clic en una barra para analizar el punto en el Evaluador.
@@ -492,7 +773,7 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
         {/* Gráfico 2: Donut de Distribución de Riesgo */}
         <div className="lg:col-span-4 bg-white border border-slate-200 rounded-xl p-6 flex flex-col justify-between">
           <div>
-            <h3 className="text-base font-bold text-slate-900">Distribución por Nivel de Riesgo</h3>
+            <h3 className="text-base font-bold text-slate-900">Distribución por Nivel de Referencia</h3>
             <p className="text-xs text-slate-500 mt-0.5">
               Clasificación agregada de los {summary.totalPoints} puntos activos bajo enfoque graduado.
             </p>
@@ -557,24 +838,32 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
         </div>
       </section>
 
-      {/* MATRIZ DE DECISIONES GERENCIALES */}
+      {/* PLAN DE ACCIÓN Y PRIORIDADES OPERATIVAS */}
       <section className="bg-white border border-slate-200 rounded-xl overflow-hidden">
-        <div className="p-6 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="p-6 border-b border-slate-200 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           <div>
             <h3 className="text-base font-bold text-slate-900">
-              Matriz de Decisiones Prioritarias para la Dirección y Operaciones
+              Plan de Acción y Prioridades de Vigilancia Radiológica
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
-              Acciones concretas derivadas automáticamente de las lecturas de campo para asignación de recursos, control de accesos y cumplimiento regulatorio.
+              Recomendaciones generadas automáticamente a partir de las mediciones en campo para orientar la operación segura, el control de accesos y el seguimiento técnico.
             </p>
           </div>
-          <div className="flex items-center gap-2 shrink-0 no-print">
+          <div className="flex flex-wrap items-center gap-2 shrink-0 no-print">
+            <button
+              type="button"
+              onClick={handleExportSummaryCSV}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors whitespace-nowrap"
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5" />
+              Exportar CSV
+            </button>
             <button
               type="button"
               onClick={() => onNavigate('decisions')}
               className="px-3.5 py-2 rounded-lg text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors whitespace-nowrap"
             >
-              Abrir Árboles de Decisión
+              Protocolos de Gestión
             </button>
             <button
               type="button"
@@ -590,7 +879,7 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
           <div className="p-8 text-center">
             <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto mb-2" />
             <p className="text-sm font-semibold text-slate-900">
-              No se registran desviaciones radiológicas que requieran intervención gerencial.
+              No se registran desviaciones radiológicas que requieran acciones adicionales.
             </p>
             <p className="text-xs text-slate-500 mt-1">
               Todas las estaciones operan dentro del fondo natural esperado ({avgBackground.toFixed(3)} µSv/h).
@@ -605,7 +894,7 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
                   <th className="py-3 px-4 font-semibold text-right">Tasa Neta</th>
                   <th className="py-3 px-4 font-semibold">Nivel & Urgencia</th>
                   <th className="py-3 px-4 font-semibold">Responsable</th>
-                  <th className="py-3 px-4 font-semibold">Directriz Recomendada</th>
+                  <th className="py-3 px-4 font-semibold">Acción Recomendada</th>
                   <th className="py-3 px-4 font-semibold text-right no-print">Acción</th>
                 </tr>
               </thead>
