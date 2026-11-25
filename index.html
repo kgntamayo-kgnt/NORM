@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      (function () {
+        try {
+          var desc = Object.getOwnPropertyDescriptor(window, 'fetch');
+          if (desc && desc.get && !desc.set && desc.configurable) {
+            var overrideFetch = null;
+            Object.defineProperty(window, 'fetch', {
+              configurable: true,
+              enumerable: desc.enumerable,
+              get: function () {
+                return overrideFetch || desc.get.call(window);
+              },
+              set: function (fn) {
+                if (typeof fn === 'function') {
+                  overrideFetch = fn;
+                }
+              },
+            });
+          }
+        } catch (e) {
+          // Ignore if window.fetch is non-configurable
+        }
+
+        window.addEventListener(
+          'error',
+          function (event) {
+            var src = event && event.filename ? String(event.filename) : '';
+            var msg = event && event.message ? String(event.message) : '';
+            if (
+              src.indexOf('chrome-extension://') === 0 ||
+              msg.indexOf('Cannot set property fetch of #<Window>') !== -1
+            ) {
+              event.preventDefault();
+              event.stopImmediatePropagation();
+            }
+          },
+          true
+        );
+      })();
+    </script>
+    <title>NORM Oil & Gas Hub — Vigilancia Radiológica y Toma de Decisiones</title>
+    <meta
+      name="description"
+      content="Plataforma ejecutiva y técnica de vigilancia radiológica, análisis gráfico y toma de decisiones para la gestión NORM en el sector Oil & Gas (MME / OIEA GSR Part 3 / SSG-60 / IOGP 412). Desarrollado por Karel Giovanny Nuñez."
+    />
+    <meta property="og:title" content="NORM Oil & Gas Hub — Vigilancia Radiológica y Toma de Decisiones" />
+    <meta
+      property="og:description"
+      content="Plataforma ejecutiva y técnica de vigilancia radiológica, análisis gráfico y toma de decisiones para la gestión NORM en el sector Oil & Gas. Desarrollado por Karel Giovanny Nuñez."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-[#F4F6F9] text-slate-900 antialiased selection:bg-amber-200 selection:text-slate-950">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
