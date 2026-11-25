@@ -445,7 +445,7 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
             </div>
 
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
-              Estado Radiológico de la Instalación y Prioridades Operativas
+              Criterios Orientadores de Vigilancia Radiológica para Empresas y Partes Interesadas
             </h2>
 
             <div className={`p-4 rounded-xl border ${globalVerdict.borderTone} backdrop-blur-xs transition-all duration-200`}>
