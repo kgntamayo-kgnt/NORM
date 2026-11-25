@@ -690,10 +690,11 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
                   tickLine={false}
                 />
                 <YAxis
+                  width={78}
                   tick={{ fontSize: 12, fill: '#475569', fontFamily: 'JetBrains Mono' }}
                   axisLine={false}
                   tickLine={false}
-                  unit=" µSv"
+                  unit=" µSv/h"
                   domain={[0, (dataMax: number) => Math.max(11.5, Math.ceil(dataMax * 1.15))]}
                 />
                 <Tooltip

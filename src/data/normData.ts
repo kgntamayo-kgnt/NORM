@@ -246,7 +246,7 @@ export const ENVIRONMENTAL_MATRICES: EnvironmentalMatrixInfo[] = [
     appliesTo: ['Sedimento', 'Roca', 'Suelo'],
     radionuclides: ['²³⁸U', '²³²Th', '⁴⁰K', '²²⁶Ra', '²²⁸Ra', '²¹⁰Pb'],
     unit: 'Bq/g',
-    note: 'Caracterización radiométrica en laboratorio acreditado (Servicio Geológico Colombiano) con cadena de custodia.',
+    note: 'Caracterización radiométrica en laboratorio acreditado bajo procedimientos de muestreo, conservación y cadena de custodia.',
   },
   {
     matrix: 'Líquida',

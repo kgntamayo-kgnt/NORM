@@ -35,7 +35,7 @@ const EQUIP_STEPS: StepMeta[] = [
 
 const REM_STEPS: StepMeta[] = [
   { id: 'start', shortTitle: '1. Monitoreo > 2.5 µSv/h', kind: 'decision' },
-  { id: 'lab_check', shortTitle: '2. Caracterización SGC (>1 Bq/g)', kind: 'decision' },
+  { id: 'lab_check', shortTitle: '2. Caracterización en Laboratorio (>1 Bq/g)', kind: 'decision' },
   { id: 'execute_remediation', shortTitle: '3. Remediación y Verificación', kind: 'action' },
   { id: 'no_action', shortTitle: 'Dictamen: Sin Remediación', kind: 'release' },
   { id: 'area_released', shortTitle: 'Dictamen: Área Liberada', kind: 'release' },

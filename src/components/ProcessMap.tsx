@@ -506,7 +506,7 @@ export const ProcessMap: React.FC<ProcessMapProps> = ({ anexo2Rows, avgBackgroun
         </div>
       </section>
 
-      {/* BENCHMARK ACTIVIDAD IOGP 412 + MATRICES AMBIENTALES SGC */}
+      {/* BENCHMARK ACTIVIDAD IOGP 412 + MATRICES AMBIENTALES */}
       <section className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="lg:col-span-7 bg-white border border-slate-200 rounded-xl p-6">
           <div className="mb-4">
@@ -587,11 +587,11 @@ export const ProcessMap: React.FC<ProcessMapProps> = ({ anexo2Rows, avgBackgroun
           </div>
         </div>
 
-        {/* Matrices Ambientales de Caracterización (SGC) */}
+        {/* Matrices Ambientales de Caracterización */}
         <div className="lg:col-span-5 bg-white border border-slate-200 rounded-xl p-6 flex flex-col justify-between space-y-4">
           <div>
             <h3 className="text-base font-bold text-slate-900">
-              Matrices Ambientales de Muestreo (SGC)
+              Matrices Ambientales de Muestreo
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
               Radionucleidos prioritarios y unidades de reporte requeridas en estudios ambientales y vigilancia.
