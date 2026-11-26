@@ -529,7 +529,7 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
                 través de la técnica de fracturamiento hidráulico multietapa con perforación
                 horizontal”
               </strong>{' '}
-              (Grupo de Energías no Convencionales y Asuntos Nucleares, OARE – MinEnergía), diseñado
+              (Grupo de Asuntos Nucleares – MinEnergía), diseñado
               como herramienta abierta de consulta y apoyo para equipos técnicos, operadores, HSE,
               responsables de vigilancia radiológica y grupos de interés.
             </p>
